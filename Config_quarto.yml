@@ -10,10 +10,15 @@ website:
   navbar:
     background: primary
     search: false
+    right:
+      text: ""
     
 format:
   html:
-    theme: sandstone
+    theme: # trying to place a toggle button for light and dark theme choice, but still figuring it out
+      light: sandstone
+      dark: darkly
+    toggle: true
     toc: false
     css: styles.css
 
