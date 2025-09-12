@@ -10,8 +10,6 @@ website:
   navbar:
     background: primary
     search: false
-    right:
-      text: ""
     
 format:
   html:
