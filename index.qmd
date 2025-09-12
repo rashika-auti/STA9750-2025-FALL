@@ -13,7 +13,7 @@ Welcome to Rashika Auti's portfolio
 </h1>
 <div style="
   width:50%;
-  height:10px;
+  height:5px;
   background-color:#999999;
   margin: 0 auto;
 "></div>
