@@ -102,7 +102,9 @@ glimpse(COUNTRY_TOP_10) # check if N/As have been replaced with NA in season_tit
 
 ### Initial Data Exploration
 This step involves preparing the data for analysis by cleaning and transforming it. Key tasks include formatting column names, identifying unique values, and converting units to make the dataset structured, consistent, and easier to work with.
+
 #### Leveraging the DT Package for Enhanced Table Readability
+
 <!-- Using DT package to create more attractive visualizations of the results. It wraps the Javascript datatables library to provide interactive tables--> 
 ```{r}
 if(!require("DT")) install.packages("DT") # installing DT package
