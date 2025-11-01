@@ -15,6 +15,7 @@ execute:
   echo: true
   warning: false
   message: false
+css: style.css
 ---
 
 <span style="font-size:14px; color:gray;">PUBLISHED ON: `r Sys.Date()`</span>

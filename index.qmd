@@ -1,22 +1,9 @@
 ---
-# Moving the title below for formatting
+title: "Welcome to Rashika Auti's Portfolio"
+format: html
+css: style.css
 ---
 
-<h1 style="
-  font-size:45px;
-  background: linear-gradient(90deg, #1b2631);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-align: center;
-  margin-bottom:10;">
-Welcome to Rashika Auti's portfolio
-</h1>
-<div style="
-  width:50%;
-  height:5px;
-  background-color:#999999;
-  margin: 0 auto;
-"></div>
 
 # About {style="font-size: 30px;"}
 

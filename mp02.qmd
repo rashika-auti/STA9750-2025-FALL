@@ -15,6 +15,7 @@ execute:
   echo: true
   warning: false
   message: false
+css: style.css
 ---
 <span style="color:#0041C2; font-family:'Georgia'; font-size:28px; font-weight:bold">
 NIMBY to YIMBY: Mapping Affordable Living

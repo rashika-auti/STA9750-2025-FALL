@@ -10,6 +10,18 @@ website:
   navbar:
     background: primary
     search: false
+    left:
+      - text: "Home"
+        href: index.qmd
+    right:
+      - text: "MP#01"
+        href: mp01.html
+      - text: "MP#02"
+        href: mp02.html
+      - text: "MP#03"
+        href: mp03.html
+      - text: "MP#04"
+        href: mp04.html    
     
 format:
   html:
