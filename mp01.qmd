@@ -761,3 +761,4 @@ ggplot(category_views, aes(x = "", y = total_views, fill = category)) +
 
 ```
 The pie chart above shows global Netflix viewership: English films lead at 40%, followed by English TV shows at 25%. Non-English films and TV account for 19.2% and 15.8%, reflecting growing international demand. While English content dominates, non-English programming is steadily capturing a significant share of global attention.
+
