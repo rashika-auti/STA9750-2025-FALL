@@ -24,6 +24,7 @@ Social media has become a dominant part of daily life for young adults, and its 
 
 The goal is to understand whether heavy social media use is simply a widespread habit or whether it has meaningful implications for how well students perform in their studies. By looking at trends in the data, the analysis considers whether greater time spent on social platforms is linked to lower grades, reduced focus, or other academic challenges. The broader purpose is to shed light on how digital behavior fits into the daily lives of young adults and how it may influence their well-being and academic success. This perspective contributes to our group’s overarching investigation of the emotional, cognitive, and behavioral effects of social media use in the youth population.
 
+---
 
 ### Specific Question
 
@@ -39,6 +40,12 @@ How does excessive daily social media use influence students’ academic perform
               box-shadow: 0px 8px 20px rgba(0,0,0,0.25);
               margin-top: 20px;">
 </p>
+
+This question examines whether excessive daily social media use affects students’ academic performance. By analyzing usage patterns and perceived academic impact, we can infer if heavy social media engagement is linked to lower grades, reduced focus, or academic challenges. The findings help clarify whether social media is just a habit or a factor with meaningful consequences for learning and student well-being.
+
+
+---
+
 
 
 ## Data Acquisition
@@ -79,13 +86,15 @@ head(data)
 
 ```
 
+---
+
 ### Dataset Overview
 
 This project draws on the Social Media Addiction vs Relationships dataset available through Kaggle. The dataset is based on an online survey completed by young people between the ages of sixteen and twenty five from various countries. Each entry reflects the experiences of a single respondent and brings together several types of information that support an examination of both digital habits and academic outcomes.
 
 The Social Media Addiction vs Relationships dataset contains 705 student records with variables in three main categories:
 
-- Demographics
+**- Demographics**
 
   - Age
   
@@ -93,7 +102,7 @@ The Social Media Addiction vs Relationships dataset contains 705 student records
   
   - Academic level (high school, undergraduate, graduate)
 
-- Social Media Behavior
+**- Social Media Behavior**
 
   - Average daily usage hours
   
@@ -101,7 +110,7 @@ The Social Media Addiction vs Relationships dataset contains 705 student records
   
   - Addiction score or self-reported dependency
 
-- Life Outcomes / Well-being
+**- Life Outcomes / Well-being**
 
   - Academic performance indicators (self-reported impact of social media)
   
@@ -113,7 +122,7 @@ The Social Media Addiction vs Relationships dataset contains 705 student records
 
 This structure allows us to explore relationships between social media usage and academic performance, while also considering other aspects of student well-being.
 
-**Why This Dataset is Suitable**
+<span style="color: #4682B4; font-weight: bold;">Why This Dataset is Suitable:</span>
 
 - Combines **behavioral, demographic, and outcome variables**
 
@@ -123,7 +132,7 @@ This structure allows us to explore relationships between social media usage and
 
 - Provides a consistent source of data for **clear interpretation of findings**
 
-**Limitations to Consider**
+<span style="color: #4682B4; font-weight: bold;">Limitations to Consider:</span>
 
 - **Self-reported data**: potential recall bias or social desirability bias
 
@@ -517,6 +526,8 @@ plot_data |>
 
 *Overall Insight:*
 The chart confirms that **Instagram and TikTok** stand out as the platforms **most associated with academic difficulties**, while other platforms have a smaller or mixed impact.
+
+---
 
 
 **2. Visualization #2: Addicted Score by Academic Impact**
