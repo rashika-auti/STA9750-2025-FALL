@@ -1,0 +1,616 @@
+---
+title: "Final Individual Report"
+subtitle: "Analysis: Social Media Use and Academic Performance"
+author: "Rashika Auti"
+Date: r sys.date()
+format:
+  html:
+    code-fold: true
+    code-summary: "<span style='display:inline-block; padding:1px 2px;
+    background-color:#0077B6; color:white; border-radius:2px; font-family: Arial,
+    sans-serif; font-weight:bold; font-size:15px; cursor:pointer;'>View R Code</span>"
+    toc: true
+    toc-depth: 4
+execute:
+  echo: true
+  warning: false
+  message: false
+css: style.css
+---
+
+## Introduction & Specific Question
+
+Social media has become a dominant part of daily life for young adults, and its rapid growth has raised important questions about how constant digital engagement shapes academic outcomes. This analysis examines whether extensive social media use is associated with lower academic performance among students. Using a publicly available dataset from Kaggle, the study explores patterns of usage and compares academic outcomes across different levels of engagement.
+
+The goal is to understand whether heavy social media use is simply a widespread habit or whether it has meaningful implications for how well students perform in their studies. By looking at trends in the data, the analysis considers whether greater time spent on social platforms is linked to lower grades, reduced focus, or other academic challenges. The broader purpose is to shed light on how digital behavior fits into the daily lives of young adults and how it may influence their well-being and academic success. This perspective contributes to our group’s overarching investigation of the emotional, cognitive, and behavioral effects of social media use in the youth population.
+
+
+### Specific Question
+
+
+<span style="color:#006D77; font-family:'Georgia'; font-size:24px; font-weight:bold">
+How does excessive daily social media use influence students’ academic performance? 
+</span>  
+
+
+<p align="center">
+  <img src="data/course_project/sq2.jpg" width="70%" 
+       style="border-radius: 20px;
+              box-shadow: 0px 8px 20px rgba(0,0,0,0.25);
+              margin-top: 20px;">
+</p>
+
+
+## Data Acquisition
+To begin the analysis, the first step is to obtain a reliable and structured dataset that captures both social media usage patterns and indicators of academic performance. The dataset used in this project comes from [Kaggle](https://www.kaggle.com/datasets/adilshamim8/social-media-addiction-vs-relationships), a platform that provides open access to user-contributed data for research and learning. This particular dataset includes information on students’ time spent on social media alongside variables related to their academic standing and well-being.
+
+Using a single, consistent dataset allows the analysis to focus on patterns within a defined student population. It also ensures that all findings are grounded in the same source of information, which supports clear interpretation later in the project. Once the dataset is acquired, it is prepared for analysis through careful cleaning, checking for missing values, and organizing the variables so they can be examined meaningfully in the next stages.
+
+
+```{r}
+#| echo: false
+#| warning: false
+#| output: false
+# Load necessary libraries
+
+library(readr)
+library(dplyr)
+
+
+# Set the file path
+
+file_path <- "C:/Users/rasik/OneDrive/Documents/STA9750-2025-FALL/data/course_project/Students Social Media Addiction.csv"
+
+
+# Load the CSV
+
+data <- read_csv(file_path)
+
+
+# Quick overview
+
+glimpse(data)    # structure of the dataset
+summary(data)    # summary statistics
+
+
+# Optional: view first few rows
+
+head(data)
+
+```
+
+### Dataset Overview
+
+This project draws on the Social Media Addiction vs Relationships dataset available through Kaggle. The dataset is based on an online survey completed by young people between the ages of sixteen and twenty five from various countries. Each entry reflects the experiences of a single respondent and brings together several types of information that support an examination of both digital habits and academic outcomes.
+
+The Social Media Addiction vs Relationships dataset contains 705 student records with variables in three main categories:
+
+- Demographics
+
+  - Age
+  
+  - Gender
+  
+  - Academic level (high school, undergraduate, graduate)
+
+- Social Media Behavior
+
+  - Average daily usage hours
+  
+  - Most-used platform (Instagram, Facebook, etc.)
+  
+  - Addiction score or self-reported dependency
+
+- Life Outcomes / Well-being
+
+  - Academic performance indicators (self-reported impact of social media)
+  
+  - Mental health score
+  
+  - Sleep patterns
+  
+  - Relationship status and conflicts
+
+This structure allows us to explore relationships between social media usage and academic performance, while also considering other aspects of student well-being.
+
+**Why This Dataset is Suitable**
+
+- Combines **behavioral, demographic, and outcome variables**
+
+- Supports analysis of **correlations between social media use and academic performance**
+
+- Enables comparisons across **student subgroups** (e.g., by age, gender, academic level)
+
+- Provides a consistent source of data for **clear interpretation of findings**
+
+**Limitations to Consider**
+
+- **Self-reported data**: potential recall bias or social desirability bias
+
+- **Cross-sectional design**: only supports correlation, not causation
+
+- **Moderate sample size**: subgroup analyses may have lower statistical power
+
+
+## Data Preparation
+
+Before beginning the analysis, it is important to ensure that the dataset is clean, consistent, and ready for exploration. This involves handling missing values, correcting variable types, and organizing the data in a way that makes analysis straightforward and reliable. For example, variables like Gender, Academic Level, or Most Used Platform are categories rather than numbers, so they are treated as factors to make analysis and visualization easier.
+
+```{r}
+#| echo: false
+#| warning: false
+
+# Data Cleaning & Preparation
+library(dplyr)
+library(tidyr)
+library(DT)
+
+# Rename columns for clarity
+working_data <- data 
+
+# Check for missing values
+#colSums(is.na(working_data))
+
+# Handle missing values
+working_data <- working_data |>
+  drop_na()  # simple approach: remove rows with missing data
+
+# 5. Convert categorical variables to factors
+working_data <- working_data |>
+  mutate(
+    Gender = as.factor(Gender),
+    Academic_Level = as.factor(Academic_Level),
+    Most_Used_Platform = as.factor(Most_Used_Platform),
+    Relationship_Status = as.factor(Relationship_Status)
+  )
+
+library(stringr)
+format_titles <- function(df){
+    colnames(df) <- str_replace_all(colnames(df), "_", " ") |> str_to_title()
+    df
+}
+working_data |> 
+  format_titles() |>
+  datatable(options = list(searching = FALSE, info = FALSE))
+
+```
+
+
+
+## Data Analysis
+With the dataset cleaned and prepared, the next step is to explore the relationship between social media usage and academic performance. The analysis focuses on key variables such as **average daily usage hours, addiction score, gender,** and preferred **social media platform** to understand both the overall trends and differences across student subgroups. By applying a combination of correlation, regression, and group comparison techniques, we can assess not only whether social media use impacts **academic performance**, but also the **extent of that impact** and which factors contribute most strongly to it.
+
+
+### Descriptive Analysis
+
+**1. Correlation between Daily Usage and Academic Impact**
+To begin, we examine whether there is a direct relationship between the number of hours students spend on social media daily and the impact on their academic performance. Using a correlation analysis, we can quantify both the direction and strength of this relationship, providing an initial insight into how increased usage may be associated with academic challenges.
+
+```{r}
+library(dplyr)
+library(knitr)
+library(kableExtra)
+
+working_data <- working_data |>
+  mutate(
+    Affects_Academic_Performance_Num = ifelse(Affects_Academic_Performance == "Yes", 1, 0)
+  )
+
+# Run correlation
+cor_test <- cor.test(
+  working_data$Avg_Daily_Usage_Hours,
+  working_data$Affects_Academic_Performance_Num
+)
+
+# Create summary table dynamically
+cor_summary <- data.frame(
+  Variable_1 = "Avg_Daily_Usage_Hours",
+  Variable_2 = "Affects_Academic_Performance_Num",
+  Correlation = round(cor_test$estimate, 3),
+  `p-value` = signif(cor_test$p.value, 3),
+  `95% CI Lower` = round(cor_test$conf.int[1], 3),
+  `95% CI Upper` = round(cor_test$conf.int[2], 3)
+)
+
+# Display styled table with centered caption
+cor_summary |>
+  kable(
+    caption = "Correlation Between Social Media Usage and Academic Impact",
+    digits = 3,
+    col.names = c("Variable 1", "Variable 2", "Correlation", "p-value", "95% CI Lower", "95% CI Upper")
+  ) |>
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    position = "center"
+  ) |>
+  row_spec(0, bold = TRUE, color = "white", background = "#1F4E79")
+
+
+```
+
+There is a **strong positive correlation (r = 0.661, p < 0.001)** between average daily social media usage and the likelihood of reporting a negative impact on academic performance. This indicates that **students who spend more hours on social media are substantially more likely to report that it affects their academics**, and the 95% confidence interval (0.618 – 0.701) confirms that this relationship is both robust and statistically significant.
+
+---
+
+
+**2. Chi-Square Test for Gender vs Academic Impact**
+
+To understand whether the experience of academic impact differs between male and female students, we first examine how each gender responds to the question of whether social media affects their academic performance. A chi-square test allows us to compare the distribution of Yes and No responses across gender groups. This provides a clear indication of whether academic impact is experienced equally across genders or whether one group appears more affected than the other.
+
+
+
+```{r}
+library(dplyr)
+library(knitr)
+library(kableExtra)
+
+# Create contingency table
+gender_table <- table(working_data$Gender, working_data$Affects_Academic_Performance)
+
+# Run chi-square test
+chi_gender <- chisq.test(gender_table)
+
+# Build dynamic results table
+chi_gender_summary <- data.frame(
+  Statistic = round(chi_gender$statistic, 3),
+  `Degrees of Freedom` = chi_gender$parameter,
+  `p-value` = signif(chi_gender$p.value, 3)
+)
+
+# Display styled table
+chi_gender_summary |>
+  kable(
+    caption = "Chi-Square Test: Gender vs Academic Impact",
+    digits = 3,
+    col.names = c("Chi-Square Statistic", "Degrees of Freedom", "p-value")
+  ) |>
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    position = "center"
+  ) |>
+  row_spec(0, bold = TRUE, color = "white", background = "#1F4E79")
+
+
+```
+
+
+The chi square test examining the association between **gender** and **perceived impact of social media on academic performance** shows no statistically significant relationship (χ² = 0.334, df = 1, p = 0.563). This indicates that **male and female respondents do not differ meaningfully** in how they report academic performance being affected by social media use. In other words, **gender is not a predictor** of whether students feel their academics are impacted.
+
+
+---
+
+**3. Comparison Across Social Media Platforms**
+
+To understand whether certain social media platforms are more strongly associated with academic impact, it is important to compare students’ self-reported academic performance across the platforms they use most frequently. Different platforms attract different content styles, user behaviors, and engagement patterns, which may translate into varying levels of distraction or influence on study habits. By examining how academic impact responses differ across platforms, we can identify which platforms contribute most to the overall association and which ones appear more academically disruptive compared to others. This comparison helps reveal whether the effect of social media is uniform across platforms or driven by a few specific ones.
+
+
+```{r}
+#| warning: FALSE
+library(dplyr)
+library(tidyr)
+library(kableExtra)
+
+# Ensure variables are factors
+working_data <- working_data |>
+  mutate(
+    Most_Used_Platform = as.factor(Most_Used_Platform),
+    Affects_Academic_Performance = as.factor(Affects_Academic_Performance)
+  )
+
+# Create platform comparison table
+platform_table <- working_data |>
+  count(Most_Used_Platform, Affects_Academic_Performance) |>
+  pivot_wider(
+    names_from = Affects_Academic_Performance,
+    values_from = n,
+    values_fill = 0
+  )
+
+# Convert to matrix for chi-square test
+platform_matrix <- working_data |>
+  select(Most_Used_Platform, Affects_Academic_Performance) |>
+  table()
+
+# Run chi-square test
+chi_platform <- chisq.test(platform_matrix)
+
+# Summary results
+platform_results <- tibble(
+  Statistic = chi_platform$statistic,
+  df = chi_platform$parameter,
+  p_value = chi_platform$p.value
+)
+
+# Display styled table
+platform_results |>
+  kable(
+    caption = "Chi Square Test: Platform vs Academic Performance",
+    digits = 3,
+    col.names = c("Chi Square Statistic", "Degrees of Freedom", "p value")
+  ) |>
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    position = "center"
+  ) |>
+  row_spec(0, bold = TRUE, color = "white", background = "#1F4E79")
+
+
+
+```
+
+The chi-square test examining the relationship between students’ most-used social media platform and whether social media affects their academic performance shows a very strong and statistically significant association (χ² = 260.325, df = 11, p < 0.001).
+
+This indicates that academic impact is not distributed evenly across platforms. Some platforms are used disproportionately by students who report that their academics are affected, while others are more common among students who report no impact. In other words, certain platforms are likely contributing more to academic difficulties than others.
+
+The next step is to examine standardized residuals to identify which platforms are driving this effect the most.
+
+```{r}
+#| warning: FALSE
+library(dplyr)
+library(kableExtra)
+
+# Create contingency table
+platform_table <- table(
+  working_data$Most_Used_Platform,
+  working_data$Affects_Academic_Performance
+)
+
+# Chi-square test
+chi_platform <- chisq.test(platform_table)
+
+# Extract standardized residuals
+residuals_df <- as.data.frame(chi_platform$stdres)
+
+# Clean column names
+colnames(residuals_df) <- c("Platform", "Academic_Impact", "Std_Residual")
+
+# Add magnitude column for ranking
+residuals_ranked <- residuals_df |>
+  mutate(Abs_Residual = abs(Std_Residual)) |>
+  arrange(desc(Abs_Residual))
+
+# Display top platforms driving effect
+residuals_ranked |>
+  kable(
+    caption = "Platforms Driving the Strongest Academic Impact (Ranked by Standardized Residuals)",
+    digits = 3
+  ) |>
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    position = "center"
+  ) |>
+  row_spec(0, bold = TRUE, color = "white", background = "#1F4E79")
+
+
+```
+
+
+- **TikTok** shows the strongest positive association with academic impact, meaning students who report academic issues use it far more than expected.
+
+- **Facebook** and **LinkedIn** show high residuals in the opposite direction, indicating they are used more by students who report no academic impact.
+
+- Other platforms like **WhatsApp, LINE, and VKontakte** also show notable effects, but less pronounced than TikTok.
+
+Overall, **TikTok emerges as the platform most associated with reported academic difficulties.**
+
+
+---
+
+**4. Analysis by Usage Categories**
+
+Finally, we categorize students based on their **average daily usage** into low, medium, and high groups to assess whether the **intensity of social media use correlates with academic performance**. This approach helps us understand threshold effects and visualize trends across usage levels, making it easier to interpret how usage patterns may contribute to academic outcomes.
+
+```{r}
+#| warning: FALSE
+library(dplyr)
+library(kableExtra)
+
+# Recode usage categories and set factor order
+working_data <- working_data |>
+  mutate(
+    Usage_Category = case_when(
+      Avg_Daily_Usage_Hours > 4 ~ "High (>4 hrs)",
+      Avg_Daily_Usage_Hours >= 2 & Avg_Daily_Usage_Hours <= 4 ~ "Moderate (2-4 hrs)",
+      Avg_Daily_Usage_Hours < 2 ~ "Low (<2 hrs)"
+    ),
+    Usage_Category = factor(Usage_Category, levels = c("High (>4 hrs)", "Moderate (2-4 hrs)", "Low (<2 hrs)"))
+  )
+
+# Count students by usage category and academic impact
+usage_table <- working_data |>
+  count(Usage_Category, Affects_Academic_Performance) |>
+  pivot_wider(
+    names_from = Affects_Academic_Performance,
+    values_from = n,
+    values_fill = 0
+  ) |>
+  mutate(
+    Total = Yes + No,
+    Percent_Yes = round(Yes / Total * 100, 1),
+    Percent_No = round(No / Total * 100, 1)
+  )
+
+# Display table in desired order
+usage_table |>
+  kable(
+    caption = "Academic Impact by Daily Social Media Usage Category (High | Moderate | Low)",
+    digits = 1,
+    col.names = c("Usage Category", "No", "Yes", "Total", "% No", "% Yes")
+  ) |>
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    position = "center"
+  ) |>
+  row_spec(0, bold = TRUE, color = "white", background = "#1F4E79")
+
+
+```
+
+- **High Usage (>4 hrs/day):** Most students (427 out of 536, 79.7%) report that social media does affect their academics, indicating that heavy users are more likely to experience academic difficulties.
+
+- **Moderate Usage (2–4 hrs/day):** The majority (142 out of 168, 84.5%) report no academic impact, suggesting moderate use may not strongly disrupt academics.
+
+- **Low Usage (<2 hrs/day):** Only one student in this category, who reports an academic impact, so data is too small to draw conclusions.
+
+There is a **clear trend**; students who spend **more time on social media** daily are more likely to report negative academic effects. This supports the idea that **usage intensity is positively associated with academic disruption.**
+
+
+---
+
+### Supporting Visuals
+
+**1. Visualization #1: Academic Impact Across Platforms**
+
+Not all social media platforms affect students’ academics in the same way. Some platforms may be more engaging or distracting, leading to a stronger impact on study habits and performance. By comparing students’ reports of academic difficulties across the platforms they use most, we can see which platforms are linked to the greatest academic challenges. This helps identify where social media usage may be contributing most to reduced focus or study time.
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+# Prepare data: count by platform and academic impact
+platform_counts <- working_data |>
+  count(Most_Used_Platform, Affects_Academic_Performance) |>
+  pivot_wider(
+    names_from = Affects_Academic_Performance,
+    values_from = n,
+    values_fill = 0
+  ) |>
+  mutate(Total_Yes = Yes) |>
+  arrange(desc(Total_Yes)) |>
+  mutate(Most_Used_Platform = factor(Most_Used_Platform, levels = Most_Used_Platform))
+
+# Convert to long format and set factor order for Academic_Impact
+plot_data <- platform_counts |>
+  pivot_longer(cols = c(No, Yes), names_to = "Academic_Impact", values_to = "Count") |>
+  mutate(Academic_Impact = factor(Academic_Impact, levels = c("Yes", "No"))) # Yes on left
+
+# Plot
+plot_data |>
+  ggplot(aes(x = Most_Used_Platform, y = Count, fill = Academic_Impact)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c("Yes" = "tomato", "No" = "forestgreen")) +
+  labs(
+    title = "Academic Impact by Most-Used Platform",
+    x = "Platform",
+    y = "Number of Students",
+    fill = "Academic Impact"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, face = "bold") # center-align title
+  )
+
+```
+
+- **Instagram and TikTok** have **the largest number of students reporting academic impact** (“Yes” in red), suggesting these platforms are the most strongly associated with reported academic difficulties
+
+- **Facebook and WhatsApp** show more balanced patterns: a noticeable number of students report impact, but a substantial portion report **no impact** (“No” in green)
+
+- **Platforms like LinkedIn, VKontakte, LINE, YouTube, Snapchat, and WeChat** show relatively **low counts** for academic impact, indicating fewer students feel these platforms affect their academics
+
+*Overall Insight:*
+The chart confirms that **Instagram and TikTok** stand out as the platforms **most associated with academic difficulties**, while other platforms have a smaller or mixed impact.
+
+
+**2. Visualization #2: Addicted Score by Academic Impact**
+
+This boxplot visualizes the distribution of Addicted Scores among students who report that social media affects their academic performance (“Yes”) versus those who do not (“No”). The yellow diamonds indicate the mean Addicted Score for each group, providing a clear reference for average engagement levels. The plot highlights how students perceiving academic impact tend to have higher addiction scores, suggesting a link between excessive social media use and academic challenges.
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Calculate means
+mean_data <- working_data |>
+  group_by(Affects_Academic_Performance) |>
+  summarise(mean_score = mean(Addicted_Score, na.rm = TRUE))
+
+# Plot
+working_data |>
+  ggplot(aes(x = Affects_Academic_Performance, 
+             y = Addicted_Score, 
+             fill = Affects_Academic_Performance)) +
+  
+  # Boxplot
+  geom_boxplot(alpha = 0.7, width = 0.5, outlier.shape = NA) +
+  
+  # Mean points
+  stat_summary(fun = mean, geom = "point", shape = 23, size = 4, fill = "yellow") +
+  
+  # Labels for mean
+  geom_text(data = mean_data, 
+            aes(x = Affects_Academic_Performance, 
+                y = mean_score, 
+                label = round(mean_score, 1)),
+            vjust = -1, color = "black", fontface = "bold") +
+  
+  # Labels
+  labs(
+    title = "Addicted Score by Academic Impact",
+    x = "Academic Impact",
+    y = "Addicted Score"
+  ) +
+  
+  # Colors
+  scale_fill_manual(values = c("Yes" = "tomato", "No" = "forestgreen")) +
+  
+  # Theme
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 12),
+    legend.position = "none"
+  )
+
+
+
+
+```
+The boxplot shows that students who report social media affecting their academics (Yes) have **higher addiction scores (mean = 7.5)** than those who do not (No, mean = 4.6). The wider spread for the “Yes” group indicates more variability, while the “No” group is more consistent. Overall, higher social media addiction appears linked to perceived academic challenges.
+
+
+
+## Interpretation
+
+- There is a **strong positive correlation** between daily social media usage and reported academic impact (r = 0.661, p < 0.001), with high users (>4 hrs/day) most affected.
+
+- **Gender** does not significantly influence academic impact (χ² = 0.334, p = 0.563).
+
+- Certain platforms, particularly **TikTok and Instagram**, are more strongly associated with academic difficulties.
+
+- Students reporting academic impact also have **higher addiction scores**, indicating compulsive use may contribute to academic challenges.
+
+
+
+## Conclusion
+
+Excessive social media use is linked to negative academic outcomes. **Usage intensity and addictive behavior** are key factors, while gender does not play a significant role. Awareness of platform-specific effects and moderation of daily use could help reduce academic disruption.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
